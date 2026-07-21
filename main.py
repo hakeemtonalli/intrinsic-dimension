@@ -6,9 +6,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
-
-# plot sample_mle and cnn_mle in boxplots
-
 import torch
 from transformers import RobertaTokenizer, RobertaModel
 from youtube_comment_downloader import YoutubeCommentDownloader, SORT_BY_POPULAR
