@@ -1,65 +1,14 @@
 import os
 from pathlib import Path
-from itertools import islice
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from tqdm import tqdm
-import torch
+
 from transformers import RobertaTokenizer, RobertaModel
-from youtube_comment_downloader import YoutubeCommentDownloader, SORT_BY_POPULAR
-from skdim.id import MLE
-
-
-def preprocess_text(text):
-    return text.replace("\n", " ").replace("  ", " ")
-
-
-def get_mle_single(model, tokenizer, text, solver):
-    inputs = tokenizer(
-        preprocess_text(text), truncation=True, max_length=512, return_tensors="pt"
-    )
-    with torch.no_grad():
-        outp = model(**inputs)
-
-    return solver.fit_transform(outp[0][0].numpy()[1:-1])
-
-
-def get_mle(model, tokenizer, df, key="text", is_list=False):
-    dims = []
-    MLE_solver = MLE()
-    for s in tqdm(df[key]):
-        if is_list:
-            text = s[0]
-        else:
-            text = s
-        dims.append(get_mle_single(model, tokenizer, text, MLE_solver))
-
-    return np.array(dims).reshape(-1, 1)
-
-
-def download_comments(url, num_comments=20):
-    downloader = YoutubeCommentDownloader()
-    comments = downloader.get_comments_from_url(url, sort_by=SORT_BY_POPULAR)
-    comments_list = []
-    for comment in islice(comments, num_comments):
-        # print(comment)
-        comments_list.append(comment)
-
-    comments_df = pd.DataFrame(comments_list)
-    return comments_df
-
-
-def plot_mle(gold_mle, gen_mle):
-    # get non-null entries in both
-    gold_mle = gold_mle[~np.isnan(gold_mle)]
-    gen_mle = gen_mle[~np.isnan(gen_mle)]
-
-    # plot boxplots
-    plt.boxplot([gold_mle, gen_mle])
-    plt.xlabel("Dataset")
-    plt.ylabel("Intrinsic Dimension")
+from src.data import download_comments
+from src.intrinsic import get_mle
+from src.visualization import plot_mle
 
 
 def main():

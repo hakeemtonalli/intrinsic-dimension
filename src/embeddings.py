@@ -2,34 +2,11 @@ import os
 import torch
 import numpy as np
 from tqdm import tqdm
-from torchvision import models, transforms
+from torchvision import models
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
-from skdim.id import MLE
-
-
-def preprocess_image(image):
-    """Preprocess the image for ResNet."""
-    transform = transforms.Compose(
-        [
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
-    return transform(image)
-
-
-def get_vision_mle(embeddings):
-    """Compute the MLE for all embeddings."""
-    # dims = []
-    print("Computing MLE for embeddings...")
-    print(embeddings.shape)
-    solver = MLE()  # Set n_neighbors to a valid value
-    dims = solver.fit_transform(embeddings)
-    # for embedding in tqdm(embeddings):
-    #     dims.append(get_mle_single(embedding, MLE_solver))
-    return np.array(dims).reshape(-1, 1)
+from src.data import preprocess_image
+from src.intrinsic import get_vision_mle
 
 
 def extract_embeddings(data_loader, model, device):

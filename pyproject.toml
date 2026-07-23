@@ -1,0 +1,19 @@
+[project]
+name = "src"
+version = "0.0.1"
+description = "Intrinsic Dimension Estimation"
+readme = "README.md"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.black]
+include = "."
+line-length = 88
+
+[tool.ruff]
+line-length = 88
