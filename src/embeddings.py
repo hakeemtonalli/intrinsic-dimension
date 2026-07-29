@@ -1,7 +1,11 @@
 import os
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 from tqdm import tqdm
+from sklearn.decomposition import PCA
 from torchvision import models
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
@@ -46,6 +50,15 @@ def main():
     print(f"embeddings shape: {embeddings.shape}")
     print(f"mle_values shape: {mle_values.shape}")
     print(f"mle_values: {mle_values}")
+
+    # scatterplot of embeddings colored by their class
+    pca = PCA(n_components=2)
+    pca_embeddings = pca.fit_transform(embeddings)
+    pca_df = pd.DataFrame(pca_embeddings, columns=["PC1", "PC2"])
+    pca_df["label"] = [dataset.classes[label] for _, label in dataset.samples]
+    sns.scatterplot(data=pca_df, x="PC1", y="PC2", hue="label", palette="tab10")
+    plt.title("PCA of EuroSAT_RGB Embeddings")
+    plt.savefig("outputs/eurosat_embeddings_pca.png")
 
     # Save embeddings and MLE values
     output_dir = "outputs"
